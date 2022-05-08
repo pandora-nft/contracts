@@ -12,7 +12,6 @@ import "./Lootbox.sol";
 contract LootboxFactory is Ownable, KeeperCompatible {
     mapping(uint256 => address) public lootboxAddress;
     uint256 totalLootbox = 0;
-
     constructor() {}
 
     //TODO Register Upkeep
@@ -57,6 +56,7 @@ contract LootboxFactory is Ownable, KeeperCompatible {
             _ticketPrice,
             _minimumTicketRequired
         );
+        lootbox.transferOwnership(msg.sender);
         lootboxAddress[totalLootbox] = address(lootbox);
         totalLootbox++;
     }
