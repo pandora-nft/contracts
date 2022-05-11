@@ -37,7 +37,6 @@ contract Lootbox is Ownable, ERC721Holder {
         require(msg.sender == factory, "Unauthorized");
         require(isDrawn == false, "Already drawn");
         require(_randomWords.length == numNFT, "Not enough random words");
-        //TODO draw logic
         for (uint256 i; i < numNFT; i++) {
             winners[i] = ticketOwners[_randomWords[i] % ticketSold];
         }
@@ -66,6 +65,28 @@ contract Lootbox is Ownable, ERC721Holder {
         //TODO mint ticket to buyer
         ticketOwners[ticketSold] = msg.sender;
         ticketSold += _amount;
+    }
+
+    function getPrizeWon(address player) public view returns (NFT[] memory) {
+        NFT[] memory prizes = new NFT[](numNFT);
+        uint256 count = 0;
+        for (uint256 i = 0; i < numNFT; i++) {
+            if (winners[i] == player) {
+                prizes[count] = NFTs[i];
+                count++;
+            }
+        }
+        return prizes;
+    }
+
+    function claimNFT(uint256 id) public {
+        require(isDrawn == true, "Not drawn yet");
+        require(winners[id] == msg.sender, "Not a winner");
+        IERC721(NFTs[id]._address).safeTransferFrom(
+            address(this),
+            msg.sender,
+            NFTs[id]._tokenId
+        );
     }
 
     function withdraw() public onlyOwner {
