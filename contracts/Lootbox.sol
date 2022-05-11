@@ -5,19 +5,21 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
-import "@chainlink/contracts/src/v0.8/KeeperCompatible.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
-import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
-
 contract Lootbox is Ownable, ERC721Holder {
     uint256 public drawTimestamp;
     uint256 public ticketPrice;
     uint256 public minimumTicketRequired = 0;
     uint256 public maxTicketPerWallet = type(uint256).max;
     uint256 public ticketSold = 0;
+    uint256 public numNFT = 0;
     bool public isDrawn = false;
     address factory;
+    struct NFT {
+        address _address;
+        uint256 _tokenId;
+    }
+    mapping(uint256 => NFT) public NFTs;
+    mapping(uint256 => address) public winners;
     mapping(uint256 => address) public ticketOwners;
 
     constructor(
@@ -31,9 +33,14 @@ contract Lootbox is Ownable, ERC721Holder {
         factory = msg.sender;
     }
 
-    function draw() public {
+    function draw(uint256[] memory _randomWords) public {
         require(msg.sender == factory, "Unauthorized");
+        require(isDrawn == false, "Already drawn");
+        require(_randomWords.length == numNFT, "Not enough random words");
         //TODO draw logic
+        for (uint256 i; i < numNFT; i++) {
+            winners[i] = ticketOwners[_randomWords[i] % ticketSold];
+        }
         isDrawn = true;
     }
 
@@ -41,8 +48,12 @@ contract Lootbox is Ownable, ERC721Holder {
         public
         onlyOwner
     {
+        // require(numNFT + _tokenIds.length <= maxNFT, "Too many NFTs");
         for (uint256 i = 0; i < _tokenIds.length; i++) {
             _nft.safeTransferFrom(msg.sender, address(this), _tokenIds[i]);
+            NFTs[numNFT]._address = address(_nft);
+            NFTs[numNFT]._tokenId = _tokenIds[i];
+            ++numNFT;
         }
     }
 
