@@ -9,11 +9,11 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "./Lootbox.sol";
 
-contract LootboxFactory is  Ownable, KeeperCompatible, VRFConsumerBaseV2 {
+contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
     // see https://docs.chain.link/docs/vrf-contracts/#configurations
     VRFCoordinatorV2Interface COORDINATOR;
     LinkTokenInterface LINKTOKEN;
-
+ 
     mapping(uint256 => address) public lootboxAddress;
     uint256 public totalLootbox = 0;
 
@@ -41,7 +41,7 @@ contract LootboxFactory is  Ownable, KeeperCompatible, VRFConsumerBaseV2 {
         address _vrfCoordinator,
         address _linkTokenContract,
         bytes32 _keyHash
-    ) {
+    ) VRFConsumerBaseV2(_vrfCoordinator) {
         COORDINATOR = VRFCoordinatorV2Interface(_vrfCoordinator);
         LINKTOKEN = LinkTokenInterface(_linkTokenContract);
         keyHash = _keyHash;
