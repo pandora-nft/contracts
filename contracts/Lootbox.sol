@@ -88,7 +88,7 @@ contract Lootbox is Ownable, ERC721Holder {
         if (_amount > maxTicketPerWallet) {
             revert Lootbox__ExceedMaxTicketsPerWallet();
         }
-        if (msg.value < ticketPrice * _amount) {
+        if (msg.value != ticketPrice * _amount) {
             revert Lootbox__NotEnoughEth();
         }
 
@@ -105,8 +105,8 @@ contract Lootbox is Ownable, ERC721Holder {
         if (!isRefundable) {
             revert Lootbox__NotRefundable();
         }
-        numTickets[msg.sender] = 0;
         payable(msg.sender).transfer(ticketPrice * numTickets[msg.sender]);
+        numTickets[msg.sender] = 0;
     }
 
     function getPrizeWon(address player) public view returns (NFT[] memory) {
@@ -122,8 +122,8 @@ contract Lootbox is Ownable, ERC721Holder {
     }
 
     function claimNFT(uint256 id) public {
-        if (isDrawn) {
-            revert Lootbox__AlreadyDrawn();
+        if (!isDrawn) {
+            revert Lootbox__NotDrawnYet();
         }
         if (winners[id] != msg.sender) {
             revert Lootbox__Unauthorized();
@@ -136,9 +136,22 @@ contract Lootbox is Ownable, ERC721Holder {
     }
 
     function withdraw() public onlyOwner {
-        if (isDrawn) {
+        if (!isDrawn) {
             revert Lootbox__NotDrawnYet();
         }
         payable(msg.sender).transfer(address(this).balance);
+    }
+
+    function withdrawNFT() public onlyOwner {
+        if (!isRefundable) {
+            revert Lootbox__NotRefundable();
+        }
+        for (uint256 i; i < numNFT; i++) {
+            IERC721(NFTs[i]._address).safeTransferFrom(
+                address(this),
+                msg.sender,
+                NFTs[i]._tokenId
+            );
+        }
     }
 }
