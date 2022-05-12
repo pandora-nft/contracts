@@ -5,6 +5,15 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
+error Lootbox__Unauthorized();
+error Lootbox__AlreadyDrawn();
+error Lootbox__NotDrawnYet();
+error Lootbox__NotEnoughRandomWords();
+error Lootbox__ExceedMaxTicketsPerWallet();
+error Lootbox__NotEnoughEth();
+error Lootbox__NoTicketToRefund();
+error Lootbox__NotRefundable();
+
 contract Lootbox is Ownable, ERC721Holder {
     uint256 public drawTimestamp;
     uint256 public ticketPrice;
@@ -36,9 +45,17 @@ contract Lootbox is Ownable, ERC721Holder {
     }
 
     function draw(uint256[] memory _randomWords) public {
-        require(msg.sender == factory, "Unauthorized");
-        require(!isDrawn, "Already drawn");
-        require(_randomWords.length == numNFT, "Not enough random words");
+        if (msg.sender != factory) {
+            revert Lootbox__Unauthorized();
+        }
+        if (isDrawn) {
+            revert Lootbox__AlreadyDrawn();
+        }
+        if (_randomWords.length != numNFT) {
+            // not sure if we should use >= ??
+            revert Lootbox__NotEnoughRandomWords();
+        }
+
         if (ticketSold <= minimumTicketRequired) {
             isRefundable = true;
         } else {
@@ -53,7 +70,9 @@ contract Lootbox is Ownable, ERC721Holder {
         public
         onlyOwner
     {
-        require(!isDrawn, "Already drawn");
+        if (isDrawn) {
+            revert Lootbox__AlreadyDrawn();
+        }
         for (uint256 i = 0; i < _tokenIds.length; i++) {
             _nft.safeTransferFrom(msg.sender, address(this), _tokenIds[i]);
             NFTs[numNFT]._address = address(_nft);
@@ -63,12 +82,15 @@ contract Lootbox is Ownable, ERC721Holder {
     }
 
     function buyTickets(uint256 _amount) public payable {
-        require(
-            _amount <= maxTicketPerWallet,
-            "Max ticket per wallet is reached"
-        );
-        require(msg.value == ticketPrice * _amount, "Incorrect amount");
-        require(!isDrawn, "Lootbox is already drawn");
+        if (isDrawn) {
+            revert Lootbox__AlreadyDrawn();
+        }
+        if (_amount > maxTicketPerWallet) {
+            revert Lootbox__ExceedMaxTicketsPerWallet();
+        }
+        if (msg.value < ticketPrice * _amount) {
+            revert Lootbox__NotEnoughEth();
+        }
 
         //TODO mint ticket to buyer
         ticketOwners[ticketSold] = msg.sender;
@@ -77,8 +99,12 @@ contract Lootbox is Ownable, ERC721Holder {
     }
 
     function refund() public {
-        require(numTickets[msg.sender] > 0, "No ticket to refund");
-        require(isRefundable, "Lootbox is not refundable");
+        if (numTickets[msg.sender] == 0) {
+            revert Lootbox__NoTicketToRefund();
+        }
+        if (!isRefundable) {
+            revert Lootbox__NotRefundable();
+        }
         numTickets[msg.sender] = 0;
         payable(msg.sender).transfer(ticketPrice * numTickets[msg.sender]);
     }
@@ -96,8 +122,12 @@ contract Lootbox is Ownable, ERC721Holder {
     }
 
     function claimNFT(uint256 id) public {
-        require(isDrawn, "Not drawn yet");
-        require(winners[id] == msg.sender, "Not a winner");
+        if (isDrawn) {
+            revert Lootbox__AlreadyDrawn();
+        }
+        if (winners[id] != msg.sender) {
+            revert Lootbox__Unauthorized();
+        }
         IERC721(NFTs[id]._address).safeTransferFrom(
             address(this),
             msg.sender,
@@ -106,7 +136,9 @@ contract Lootbox is Ownable, ERC721Holder {
     }
 
     function withdraw() public onlyOwner {
-        require(isDrawn, "Not drawn yet");
+        if (isDrawn) {
+            revert Lootbox__NotDrawnYet();
+        }
         payable(msg.sender).transfer(address(this).balance);
     }
 }
