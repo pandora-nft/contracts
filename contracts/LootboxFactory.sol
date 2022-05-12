@@ -96,7 +96,6 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
         override
         returns (bool upkeepNeeded, bytes memory performData)
     {
-        uint256[] memory toDrawn;
         for (uint256 i = 0; i < totalLootbox; i++) {
             if (
                 !Lootbox(lootboxAddress[i]).isDrawn() &&
