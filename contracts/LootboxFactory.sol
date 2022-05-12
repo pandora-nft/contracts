@@ -109,7 +109,6 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
         }
     }
 
-    //TODO draw function
     function performUpkeep(bytes calldata performData) external override {
         uint256 toDrawn = abi.decode(performData, (uint256));
         //We highly recommend revalidating the upkeep in the performUpkeep function
