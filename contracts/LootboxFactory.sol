@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -11,17 +11,17 @@ import "./Lootbox.sol";
 
 contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
     // see https://docs.chain.link/docs/vrf-contracts/#configurations
-    VRFCoordinatorV2Interface COORDINATOR;
-    LinkTokenInterface LINKTOKEN;
- 
+    VRFCoordinatorV2Interface immutable COORDINATOR;
+    LinkTokenInterface immutable LINKTOKEN;
+
     mapping(uint256 => address) public lootboxAddress;
     uint256 public totalLootbox = 0;
+    uint64 s_subscriptionId;
 
-    uint64 public s_subscriptionId;
     // The gas lane to use, which specifies the maximum gas price to bump to.
     // For a list of available gas lanes on each network,
     // see https://docs.chain.link/docs/vrf-contracts/#configurations
-    bytes32 keyHash;
+    bytes32 immutable gasLane;
 
     // Depends on the number of requested values that you want sent to the
     // fulfillRandomWords() function. Storing each word costs about 20,000 gas,
@@ -29,10 +29,10 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
     // this limit based on the network that you select, the size of the request,
     // and the processing of the callback request in the fulfillRandomWords()
     // function.
-    uint32 callbackGasLimit = 40000;
+    uint32 immutable callbackGasLimit = 40000;
 
     // The default is 3, but you can set this higher.
-    uint16 requestConfirmations = 3;
+    uint16 constant REQUEST_CONFIRMATIONS = 3;
 
     // map lootbox to requestIds
     mapping(uint256 => uint256) private s_lootbox;
@@ -40,11 +40,11 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
     constructor(
         address _vrfCoordinator,
         address _linkTokenContract,
-        bytes32 _keyHash
+        bytes32 _gasLane
     ) VRFConsumerBaseV2(_vrfCoordinator) {
         COORDINATOR = VRFCoordinatorV2Interface(_vrfCoordinator);
         LINKTOKEN = LinkTokenInterface(_linkTokenContract);
-        keyHash = _keyHash;
+        gasLane = _gasLane;
         createNewSubscription();
     }
 
@@ -69,9 +69,9 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
     function requestRandomWords(uint32 _numWords, uint256 _lootboxId) internal {
         // Will revert if subscription is not set and funded.
         uint256 s_requestId = COORDINATOR.requestRandomWords(
-            keyHash,
+            gasLane,
             s_subscriptionId,
-            requestConfirmations,
+            REQUEST_CONFIRMATIONS,
             callbackGasLimit,
             _numWords
         );
