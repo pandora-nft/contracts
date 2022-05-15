@@ -24,9 +24,15 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // Go to https://hardhat.org/config/ to learn more
 
 export default {
-  solidity: "0.8.4",
+  solidity: "0.8.7",
   defaultNetwork: "hardhat",
   networks: {
+    hardhat: {
+      forking: {
+        url: process.env.ROPSTEN_URL as string,
+        address: "test test test test test test test test test test test junk",
+      },
+    },
     ropsten: {
       url: process.env.ROPSTEN_URL || "",
       accounts:
@@ -40,10 +46,10 @@ export default {
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },
-  docgen: {
-    path: './docs',
-    clear: true,
-    runOnCompile: true,
-  },
+  // docgen: {
+  //   path: './docs',
+  //   clear: true,
+  //   runOnCompile: true,
+  // },
 };
 

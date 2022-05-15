@@ -8,13 +8,16 @@ import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "./Lootbox.sol";
+import "./PandoraTicket.sol";
 
 contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
     // see https://docs.chain.link/docs/vrf-contracts/#configurations
-    VRFCoordinatorV2Interface immutable COORDINATOR;
+    VRFCoordinatorV2Interface COORDINATOR;
     LinkTokenInterface immutable LINKTOKEN;
-
+    PandoraTicket ticket;
     mapping(uint256 => address) public lootboxAddress;
+    mapping(address => uint256[]) public lootboxOwned;
+    address[] public allLootboxes;
     uint256 public totalLootbox = 0;
     uint64 s_subscriptionId;
 
@@ -29,7 +32,7 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
     // this limit based on the network that you select, the size of the request,
     // and the processing of the callback request in the fulfillRandomWords()
     // function.
-    uint32 immutable callbackGasLimit = 40000;
+    uint32 immutable callbackGasLimit = 500000;
 
     // The default is 3, but you can set this higher.
     uint16 constant REQUEST_CONFIRMATIONS = 3;
@@ -46,6 +49,20 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
         LINKTOKEN = LinkTokenInterface(_linkTokenContract);
         gasLane = _gasLane;
         createNewSubscription();
+        ticket = new PandoraTicket(address(this));
+        ticket.transferOwnership(msg.sender);
+    }
+    //getter
+    function getLootboxName(uint256 _lootboxId) public view returns (string memory) {
+        return Lootbox(lootboxAddress[_lootboxId]).name();
+    }
+
+    function ticketAddress() public view returns(address){
+        return address(ticket);
+    }
+
+    function getLootboxOwned(address _owner) public view returns(uint256[] memory){
+        return lootboxOwned[_owner];
     }
 
     // VRF
@@ -123,17 +140,52 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
     }
 
     function deployLootbox(
+        string memory _name,
+        uint256 _drawTimestamp,
+        uint256 _ticketPrice,
+        uint256 _minimumTicketRequired,
+        uint256 _maxTicketPerWallet
+    ) public {
+        Lootbox lootbox = new Lootbox(
+            _name,
+            totalLootbox,
+            _drawTimestamp,
+            _ticketPrice,
+            _minimumTicketRequired,
+            _maxTicketPerWallet
+        );
+        lootbox.transferOwnership(msg.sender);
+        lootboxAddress[totalLootbox] = address(lootbox);
+        lootboxOwned[msg.sender].push(totalLootbox);
+        allLootboxes.push(address(lootbox));
+        totalLootbox++;
+    }
+
+    function deployLootbox(
+        string memory _name,
         uint256 _drawTimestamp,
         uint256 _ticketPrice,
         uint256 _minimumTicketRequired
     ) public {
         Lootbox lootbox = new Lootbox(
+            _name,
+            totalLootbox,
             _drawTimestamp,
             _ticketPrice,
-            _minimumTicketRequired
+            _minimumTicketRequired,
+            type(uint256).max
         );
         lootbox.transferOwnership(msg.sender);
         lootboxAddress[totalLootbox] = address(lootbox);
+        lootboxOwned[msg.sender].push(totalLootbox);
+        allLootboxes.push(address(lootbox));
         totalLootbox++;
+    }
+
+    function mintTicket(address _to, uint256 _amount, uint256 _lootboxId) public {
+        if(msg.sender != lootboxAddress[_lootboxId]){
+            revert("Unauthorized");
+        }
+        ticket.mint(_to, _amount, _lootboxId);
     }
 }

@@ -12,28 +12,18 @@ async function main() {
   // If this script is run directly using `node` you may want to call compile
   // manually to make sure everything is compiled
   // await hre.run('compile');
-  const POINT_ONE_LINK = 1e17;
-  const ONE_LINK = 1e18;
+
+  const ONE_LINK = "1000000000000000000";
+  const POINT_ONE_LINK = "100000000000000000";
   const accounts = await ethers.getSigners();
   const chainId = network.config.chainId;
   const deployerAddress = accounts[0].address;
 
   let vrfCoordinatorV2Address, linkTokenAddress, gasLane
   if (chainId == 31337) {
-    const VRFCoordinatorV2Mock = await ethers.getContractFactory("VRFCoordinatorV2Mock");
-    const vrfCoordinatorV2Mock = await VRFCoordinatorV2Mock.deploy(
-      POINT_ONE_LINK,
-      1e9
-    );
-
-    await vrfCoordinatorV2Mock.deployed();
-    vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address;
-
-    const LinkToken = await ethers.getContractFactory("LinkToken");
-    const linkToken = await LinkToken.deploy();
-    await linkToken.deployed();
-    linkTokenAddress = linkToken.address;
-    gasLane = "0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0";
+    vrfCoordinatorV2Address = VRF_COORDINATOR[4];
+    linkTokenAddress = LINK_TOKEN[4];
+    gasLane = GAS_LANE[4];
 
   } else {
     vrfCoordinatorV2Address = VRF_COORDINATOR[chainId!];
@@ -53,9 +43,9 @@ async function main() {
   console.log("lootboxFactory deployed at:", lootboxFactory.address);
 
   //Top up with LINK Token
-  await lootboxFactory.topUpSubscription(
-    ONE_LINK
-  )
+  // await lootboxFactory.topUpSubscription(
+  //   ONE_LINK
+  // )
   
 }
 

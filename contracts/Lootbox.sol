@@ -4,6 +4,7 @@ pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import "./LootboxFactory.sol";
 
 error Lootbox__Unauthorized();
 error Lootbox__AlreadyDrawn();
@@ -13,17 +14,21 @@ error Lootbox__ExceedMaxTicketsPerWallet();
 error Lootbox__NotEnoughEth();
 error Lootbox__NoTicketToRefund();
 error Lootbox__NotRefundable();
+error Lootbox__TooManyNFTsDeposited();
 
 contract Lootbox is Ownable, ERC721Holder {
     uint256 public drawTimestamp;
     uint256 public ticketPrice;
-    uint256 public minimumTicketRequired = 0;
-    uint256 public maxTicketPerWallet = type(uint256).max;
+    uint256 public minimumTicketRequired;
+    uint256 public maxTicketPerWallet;
+    uint256 immutable maxNFT = 500;
     uint256 public ticketSold = 0;
     uint256 public numNFT = 0;
     bool public isDrawn = false;
     bool public isRefundable = false;
     address factory;
+    string public name;
+    uint256 public id;
     struct NFT {
         address _address;
         uint256 _tokenId;
@@ -34,13 +39,19 @@ contract Lootbox is Ownable, ERC721Holder {
     mapping(address => uint256) public numTickets;
 
     constructor(
+        string memory _name,
+        uint256 _id,
         uint256 _drawTimestamp,
         uint256 _ticketPrice,
-        uint256 _minimumTicketRequired
+        uint256 _minimumTicketRequired,
+        uint256 _maxTicketPerWallet
     ) {
+        name = _name;
+        id = _id;
         drawTimestamp = _drawTimestamp;
         ticketPrice = _ticketPrice;
         minimumTicketRequired = _minimumTicketRequired;
+        maxTicketPerWallet = _maxTicketPerWallet;
         factory = msg.sender;
     }
 
@@ -52,7 +63,6 @@ contract Lootbox is Ownable, ERC721Holder {
             revert Lootbox__AlreadyDrawn();
         }
         if (_randomWords.length != numNFT) {
-            // not sure if we should use >= ??
             revert Lootbox__NotEnoughRandomWords();
         }
 
@@ -72,6 +82,9 @@ contract Lootbox is Ownable, ERC721Holder {
     {
         if (isDrawn) {
             revert Lootbox__AlreadyDrawn();
+        }
+        if (numNFT + _tokenIds.length > maxNFT) {
+            revert Lootbox__TooManyNFTsDeposited();
         }
         for (uint256 i = 0; i < _tokenIds.length; i++) {
             _nft.safeTransferFrom(msg.sender, address(this), _tokenIds[i]);
@@ -93,6 +106,7 @@ contract Lootbox is Ownable, ERC721Holder {
         }
 
         //TODO mint ticket to buyer
+        LootboxFactory(factory).mintTicket(msg.sender, _amount, id);
         ticketOwners[ticketSold] = msg.sender;
         numTickets[msg.sender] += _amount;
         ticketSold += _amount;
@@ -121,17 +135,17 @@ contract Lootbox is Ownable, ERC721Holder {
         return prizes;
     }
 
-    function claimNFT(uint256 id) public {
+    function claimNFT(uint256 nftId) public {
         if (!isDrawn) {
             revert Lootbox__NotDrawnYet();
         }
-        if (winners[id] != msg.sender) {
+        if (winners[nftId] != msg.sender) {
             revert Lootbox__Unauthorized();
         }
-        IERC721(NFTs[id]._address).safeTransferFrom(
+        IERC721(NFTs[nftId]._address).safeTransferFrom(
             address(this),
             msg.sender,
-            NFTs[id]._tokenId
+            NFTs[nftId]._tokenId
         );
     }
 

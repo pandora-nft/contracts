@@ -1,6 +1,6 @@
 export const VRF_COORDINATOR: { [chainId: number]: string } = {
     //Rinkeby
-    4: "0x0f4f2ac550a1b4e2280d04c21cea7ebd822934b5",
+    4: "0x6168499c0cFfCaCD319c818142124B7A15E857ab",
     //BNB Testnet
     97: "0x6A2AAd07396B36Fe02a22b33cf443582f682c82f",
     //Polygon Testnet
