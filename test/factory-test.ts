@@ -81,7 +81,7 @@ describe("LootboxFactory", function () {
     //TODO test more about buying ticket
     describe("Try minting 2 tickets", function () {
         before(async function () {
-            const tx = await lootbox.connect(accounts[2]).buyTickets(2,
+            const tx = await lootbox.connect(accounts[1]).buyTickets(2,
                 {
                     value: ethers.utils.parseEther("0.02"),
                 });
@@ -91,8 +91,28 @@ describe("LootboxFactory", function () {
         it("Should mint a ticket", async function () {
             console.log(await ticket.tokenURI(1));
             expect(await ticket.totalSupply()).to.equal(2);
-            expect(await ticket.tokenOfOwnerByIndex(accounts[2].address, 1)).to.equal(1);
+            expect(await ticket.tokenOfOwnerByIndex(accounts[1].address, 1)).to.equal(1);
         });
-        
+
+    });
+
+    describe("Try depositing", function () {
+        before(async function () {
+            await lootbox.connect(accounts[1]).buyTickets(3,
+                {
+                    value: ethers.utils.parseEther("0.03"),
+                });
+            await ticket.connect(accounts[1]).setApprovalForAll(lootbox.address, true);
+            const tx = await lootbox.connect(accounts[1]).depositNFTs(
+                ticket.address,
+                [2,3],
+            )
+            const receipt = await tx.wait();
+            console.log(receipt);
+        });
+        it("NFT should be in lootbox", async function () {
+            expect(await ticket.balanceOf(lootboxAddress)).to.equal(2);
+        });
+
     });
 });

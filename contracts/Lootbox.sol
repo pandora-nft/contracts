@@ -89,20 +89,20 @@ contract Lootbox is Ownable, ERC721Holder {
         isDrawn = true;
     }
 
-    function depositNFTs(IERC721 _nft, uint256[] calldata _tokenIds)
+    function depositNFTs(NFT[] memory _nfts)
         public
         onlyOwner
     {
         if (isDrawn) {
             revert Lootbox__AlreadyDrawn();
         }
-        if (numNFT + _tokenIds.length > maxNFT) {
+        if (numNFT + _nfts.length > maxNFT) {
             revert Lootbox__TooManyNFTsDeposited();
         }
-        for (uint256 i = 0; i < _tokenIds.length; i++) {
-            _nft.safeTransferFrom(msg.sender, address(this), _tokenIds[i]);
-            NFTs[numNFT]._address = address(_nft);
-            NFTs[numNFT]._tokenId = _tokenIds[i];
+        for (uint256 i = 0; i < _nfts.length; i++) {
+            IERC721(_nfts[i]._address).safeTransferFrom(msg.sender, address(this), _nfts[i]._tokenId);
+            NFTs[numNFT]._address = _nfts[i]._address;
+            NFTs[numNFT]._tokenId = _nfts[i]._tokenId;
             ++numNFT;
         }
     }
