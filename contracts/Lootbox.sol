@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "./LootboxFactory.sol";
-
+import "./PandoraTicket.sol";
 error Lootbox__Unauthorized();
 error Lootbox__AlreadyDrawn();
 error Lootbox__NotDrawnYet();
@@ -21,6 +21,7 @@ contract Lootbox is Ownable, ERC721Holder {
     uint256 public ticketPrice;
     uint256 public minimumTicketRequired;
     uint256 public maxTicketPerWallet;
+
     uint256 immutable maxNFT = 500;
     uint256 public ticketSold = 0;
     uint256 public numNFT = 0;
@@ -29,14 +30,15 @@ contract Lootbox is Ownable, ERC721Holder {
     address factory;
     string public name;
     uint256 public id;
+    address ticket;
     struct NFT {
         address _address;
         uint256 _tokenId;
     }
+
     mapping(uint256 => NFT) public NFTs;
-    mapping(uint256 => address) public winners;
-    mapping(uint256 => address) public ticketOwners;
-    mapping(address => uint256) public numTickets;
+    mapping(uint256 => uint256) public winners;
+    mapping(uint256 => uint256) public wonTicket;
 
     constructor(
         string memory _name,
@@ -44,7 +46,8 @@ contract Lootbox is Ownable, ERC721Holder {
         uint256 _drawTimestamp,
         uint256 _ticketPrice,
         uint256 _minimumTicketRequired,
-        uint256 _maxTicketPerWallet
+        uint256 _maxTicketPerWallet,
+        address _ticket
     ) {
         name = _name;
         id = _id;
@@ -53,6 +56,7 @@ contract Lootbox is Ownable, ERC721Holder {
         minimumTicketRequired = _minimumTicketRequired;
         maxTicketPerWallet = _maxTicketPerWallet;
         factory = msg.sender;
+        ticket = _ticket;
     }
 
     function draw(uint256[] memory _randomWords) public {
@@ -65,12 +69,21 @@ contract Lootbox is Ownable, ERC721Holder {
         if (_randomWords.length != numNFT) {
             revert Lootbox__NotEnoughRandomWords();
         }
-
-        if (ticketSold <= minimumTicketRequired) {
+        if (ticketSold <= minimumTicketRequired || ticketSold < numNFT) {
             isRefundable = true;
         } else {
-            for (uint256 i; i < numNFT; i++) {
-                winners[i] = ticketOwners[_randomWords[i] % ticketSold];
+            uint256 i = 0;
+            while (i < numNFT) {
+                uint256 winnerTicketId = PandoraTicket(ticket).ticketIds(
+                    id,
+                    _randomWords[i] % ticketSold
+                );
+                if (PandoraTicket(ticket).isWinner(winnerTicketId) == false) {
+                    LootboxFactory(factory).setWinner(winnerTicketId, id);
+                    winners[i] = winnerTicketId;
+                    wonTicket[winnerTicketId] = i;
+                    i++;
+                }
             }
         }
         isDrawn = true;
@@ -105,53 +118,51 @@ contract Lootbox is Ownable, ERC721Holder {
             revert Lootbox__NotEnoughEth();
         }
 
-        //TODO mint ticket to buyer
         LootboxFactory(factory).mintTicket(msg.sender, _amount, id);
-        ticketOwners[ticketSold] = msg.sender;
-        numTickets[msg.sender] += _amount;
         ticketSold += _amount;
     }
 
-    function refund() public {
-        if (numTickets[msg.sender] == 0) {
-            revert Lootbox__NoTicketToRefund();
-        }
+    function refund(uint256[] memory tokenIds) public {
         if (!isRefundable) {
             revert Lootbox__NotRefundable();
         }
-        payable(msg.sender).transfer(ticketPrice * numTickets[msg.sender]);
-        numTickets[msg.sender] = 0;
-    }
-
-    function getPrizeWon(address player) public view returns (NFT[] memory) {
-        NFT[] memory prizes = new NFT[](numNFT);
-        uint256 count = 0;
-        for (uint256 i = 0; i < numNFT; i++) {
-            if (winners[i] == player) {
-                prizes[count] = NFTs[i];
-                count++;
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            if (PandoraTicket(ticket).ownerOf(tokenIds[i]) != msg.sender) {
+                revert Lootbox__Unauthorized();
+            }
+            if (PandoraTicket(ticket).isRefunded(tokenIds[i])) {
+                revert Lootbox__NotRefundable();
             }
         }
-        return prizes;
+        LootboxFactory(factory).refundTicket(tokenIds, id);
+        payable(msg.sender).transfer(ticketPrice * tokenIds.length);
     }
 
-    function claimNFT(uint256 nftId) public {
+    function claimNFT(uint256 _ticketId) public {
         if (!isDrawn) {
             revert Lootbox__NotDrawnYet();
         }
-        if (winners[nftId] != msg.sender) {
+        if (PandoraTicket(ticket).ownerOf(_ticketId) != msg.sender) {
             revert Lootbox__Unauthorized();
         }
-        IERC721(NFTs[nftId]._address).safeTransferFrom(
+        if (PandoraTicket(ticket).isClaimed(_ticketId)) {
+            revert Lootbox__Unauthorized();
+        }
+        
+        IERC721(NFTs[wonTicket[_ticketId]]._address).safeTransferFrom(
             address(this),
             msg.sender,
-            NFTs[nftId]._tokenId
+            NFTs[wonTicket[_ticketId]]._tokenId
         );
+        LootboxFactory(factory).setClaim(_ticketId, id);
     }
 
     function withdraw() public onlyOwner {
         if (!isDrawn) {
             revert Lootbox__NotDrawnYet();
+        }
+        if (isRefundable) {
+            revert Lootbox__Unauthorized();
         }
         payable(msg.sender).transfer(address(this).balance);
     }

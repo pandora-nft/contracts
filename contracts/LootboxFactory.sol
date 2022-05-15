@@ -152,7 +152,8 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
             _drawTimestamp,
             _ticketPrice,
             _minimumTicketRequired,
-            _maxTicketPerWallet
+            _maxTicketPerWallet,
+            address(ticket)
         );
         lootbox.transferOwnership(msg.sender);
         lootboxAddress[totalLootbox] = address(lootbox);
@@ -173,7 +174,8 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
             _drawTimestamp,
             _ticketPrice,
             _minimumTicketRequired,
-            type(uint256).max
+            type(uint256).max,
+            address(ticket)
         );
         lootbox.transferOwnership(msg.sender);
         lootboxAddress[totalLootbox] = address(lootbox);
@@ -187,5 +189,25 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
             revert("Unauthorized");
         }
         ticket.mint(_to, _amount, _lootboxId);
+    }
+
+    function refundTicket(uint256[] memory _tokenIds, uint256 _lootboxId) public {
+        if(msg.sender != lootboxAddress[_lootboxId]){
+            revert("Unauthorized");
+        }
+        ticket.refundTicket(_tokenIds);
+    }
+
+    function setWinner(uint256 _tokenId, uint256 _lootboxId) public {
+        if(msg.sender != lootboxAddress[_lootboxId]){
+            revert("Unauthorized");
+        }
+        ticket.setWinner(_tokenId);
+    }
+    function setClaim(uint256 _tokenId, uint256 _lootboxId) public {
+        if(msg.sender != lootboxAddress[_lootboxId]){
+            revert("Unauthorized");
+        }
+        ticket.setClaim(_tokenId);
     }
 }

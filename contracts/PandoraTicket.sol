@@ -12,8 +12,13 @@ error Ticket__Unauthorized();
 contract PandoraTicket is ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
     LootboxFactory factory;
-    mapping(uint256 => uint256) lootboxIds;
-    mapping(uint256 => uint256[]) ticketIds;
+    mapping(uint256 => uint256) public lootboxIds;
+    mapping(uint256 => uint256[]) public ticketIds;
+
+    mapping(uint256 => bool) public isWinner;
+    mapping(uint256 => bool) public isRefunded;
+    mapping(uint256 => bool) public isClaimed;
+
     Counters.Counter public tokenIdCounter;
     string public imageURI =
         "ipfs://bafkreigm5ir7vyiricnl23a7bbbzi3ve2tr6v54pi2qusvfuy2rlduc3we";
@@ -22,7 +27,7 @@ contract PandoraTicket is ERC721Enumerable, Ownable {
         factory = LootboxFactory(_factory);
     }
 
-    //TODO tokenURI function
+    //!Please ignore Linter error below
     function tokenURI(uint256 tokenId)
         public
         view
@@ -69,5 +74,31 @@ contract PandoraTicket is ERC721Enumerable, Ownable {
             lootboxIds[tokenId] = _lootboxId;
             ticketIds[_lootboxId].push(tokenId);
         }
+    }
+
+    function setWinner(uint256 _tokenId) public {
+        if (msg.sender != address(factory)) {
+            revert Ticket__Unauthorized();
+        }
+        isWinner[_tokenId] = true;
+    }
+
+    function refundTicket(uint256[] memory tokenIds) public {
+        if (msg.sender != address(factory)) {
+            revert Ticket__Unauthorized();
+        }
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            isRefunded[tokenIds[i]] = true;
+        }
+    }
+
+    function setClaim(uint256 _tokenId) public {
+        if (msg.sender != address(factory)) {
+            revert Ticket__Unauthorized();
+        }
+        if(isWinner[_tokenId]==false){
+            revert Ticket__Unauthorized();
+        }
+        isClaimed[_tokenId] = true;
     }
 }
