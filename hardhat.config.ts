@@ -29,12 +29,13 @@ export default {
   networks: {
     hardhat: {
       forking: {
-        url: process.env.ROPSTEN_URL as string,
+        url: process.env.RINKEBY_URL as string,
         address: "test test test test test test test test test test test junk",
       },
     },
-    ropsten: {
-      url: process.env.ROPSTEN_URL || "",
+    rinkeby: {
+      url: process.env.RINKEBY_URL || "",
+      chainId: 4,
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },

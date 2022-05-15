@@ -40,7 +40,7 @@ describe("LootboxFactory", function () {
             GAS_LANE[4],
         );
         await lootboxFactory.deployed();
-        drawTime = Math.floor(Date.now() / 1000) + 60;
+        drawTime = Math.floor(Date.now() / 1000) + 3600;
         await lootboxFactory.connect(accounts[1])["deployLootbox(string,uint256,uint256,uint256)"](
             "Test lootbox",
             drawTime,

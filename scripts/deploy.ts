@@ -13,12 +13,11 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
-  const ONE_LINK = "1000000000000000000";
-  const POINT_ONE_LINK = "100000000000000000";
   const accounts = await ethers.getSigners();
   const chainId = network.config.chainId;
   const deployerAddress = accounts[0].address;
-
+  console.log("Deploying with ", deployerAddress);
+  console.log("ChainId: ", chainId);
   let vrfCoordinatorV2Address, linkTokenAddress, gasLane
   if (chainId == 31337) {
     vrfCoordinatorV2Address = VRF_COORDINATOR[4];
@@ -37,15 +36,29 @@ async function main() {
     linkTokenAddress,
     gasLane,
   );
-
-  await lootboxFactory.deployed();
-
+  await lootboxFactory.deployed();  
+  const linkToken = await ethers.getContractAt("LinkTokenInterface", linkTokenAddress);
   console.log("lootboxFactory deployed at:", lootboxFactory.address);
+  console.log("ticket Address", await lootboxFactory.ticketAddress());
+  // Top up with LINK Token
+  await linkToken.increaseApproval(lootboxFactory.address, ethers.utils.parseEther("1"));
+  await lootboxFactory.topUpSubscription(
+    ethers.utils.parseEther("1")
+  )
 
-  //Top up with LINK Token
-  // await lootboxFactory.topUpSubscription(
-  //   ONE_LINK
-  // )
+
+  const drawTime = Math.floor(Date.now() / 1000) + 3600;
+  await lootboxFactory["deployLootbox(string,uint256,uint256,uint256)"](
+      "Test lootbox",
+      drawTime,
+      ethers.utils.parseEther("0.01"),
+      ethers.utils.parseEther("0")
+  );
+  const lootboxAddress = await lootboxFactory.lootboxAddress("0");
+
+  console.log("lootbox 0 ",await lootboxFactory.getLootboxName(0)," deployed at", lootboxAddress);
+
+
   
 }
 
