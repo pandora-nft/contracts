@@ -36,8 +36,27 @@ export default {
     rinkeby: {
       url: process.env.RINKEBY_URL || "",
       chainId: 4,
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts:[process.env.PRIVATE_KEY],
+    },
+    mumbai: {
+      url: process.env.MUMBAI_URL || "",
+      chainId: 80001,
+      accounts:[process.env.PRIVATE_KEY],
+    },
+    polygon: {
+      url: process.env.POLYGON_URL || "",
+      chainId: 137,
+      accounts:[process.env.PRIVATE_KEY],
+    },
+    bsctestnet: {
+      url: process.env.BSC_TESTNET_URL || "",
+      chainId: 97,
+      accounts:[process.env.PRIVATE_KEY],
+    },
+    bsc: {
+      url: process.env.BSC_URL || "",
+      chainId: 56,
+      accounts:[process.env.PRIVATE_KEY],
     },
   },
   gasReporter: {
@@ -45,7 +64,8 @@ export default {
     currency: "USD",
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    // apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: process.env.BSCSCAN_API_KEY,
   },
   // docgen: {
   //   path: './docs',

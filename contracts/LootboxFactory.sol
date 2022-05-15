@@ -13,13 +13,13 @@ import "./PandoraTicket.sol";
 contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
     // see https://docs.chain.link/docs/vrf-contracts/#configurations
     VRFCoordinatorV2Interface COORDINATOR;
-    LinkTokenInterface immutable LINKTOKEN;
+    LinkTokenInterface LINKTOKEN;
     PandoraTicket ticket;
     mapping(uint256 => address) public lootboxAddress;
     mapping(address => uint256[]) public lootboxOwned;
     address[] public allLootboxes;
     uint256 public totalLootbox = 0;
-    uint64 s_subscriptionId;
+    uint64 public s_subscriptionId;
 
     // The gas lane to use, which specifies the maximum gas price to bump to.
     // For a list of available gas lanes on each network,
