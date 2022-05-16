@@ -52,16 +52,25 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
         ticket = new PandoraTicket(address(this));
         ticket.transferOwnership(msg.sender);
     }
+
     //getter
-    function getLootboxName(uint256 _lootboxId) public view returns (string memory) {
+    function getLootboxName(uint256 _lootboxId)
+        public
+        view
+        returns (string memory)
+    {
         return Lootbox(lootboxAddress[_lootboxId]).name();
     }
 
-    function ticketAddress() public view returns(address){
+    function ticketAddress() public view returns (address) {
         return address(ticket);
     }
 
-    function getLootboxOwned(address _owner) public view returns(uint256[] memory){
+    function getLootboxOwned(address _owner)
+        public
+        view
+        returns (uint256[] memory)
+    {
         return lootboxOwned[_owner];
     }
 
@@ -184,30 +193,41 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
         totalLootbox++;
     }
 
-    function mintTicket(address _to, uint256 _amount, uint256 _lootboxId) public {
-        if(msg.sender != lootboxAddress[_lootboxId]){
+    function mintTicket(
+        address _to,
+        uint256 _amount,
+        uint256 _lootboxId
+    ) public {
+        if (msg.sender != lootboxAddress[_lootboxId]) {
             revert("Unauthorized");
         }
         ticket.mint(_to, _amount, _lootboxId);
     }
 
-    function refundTicket(uint256[] memory _tokenIds, uint256 _lootboxId) public {
-        if(msg.sender != lootboxAddress[_lootboxId]){
+    function refundTicket(uint256[] memory _tokenIds, uint256 _lootboxId)
+        public
+    {
+        if (msg.sender != lootboxAddress[_lootboxId]) {
             revert("Unauthorized");
         }
         ticket.refundTicket(_tokenIds);
     }
 
     function setWinner(uint256 _tokenId, uint256 _lootboxId) public {
-        if(msg.sender != lootboxAddress[_lootboxId]){
+        if (msg.sender != lootboxAddress[_lootboxId]) {
             revert("Unauthorized");
         }
         ticket.setWinner(_tokenId);
     }
+
     function setClaim(uint256 _tokenId, uint256 _lootboxId) public {
-        if(msg.sender != lootboxAddress[_lootboxId]){
+        if (msg.sender != lootboxAddress[_lootboxId]) {
             revert("Unauthorized");
         }
         ticket.setClaim(_tokenId);
+    }
+
+    function getAllLootboxes() public view returns (address[] memory) {
+        return allLootboxes;
     }
 }
