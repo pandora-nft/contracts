@@ -89,10 +89,7 @@ contract Lootbox is Ownable, ERC721Holder {
         isDrawn = true;
     }
 
-    function depositNFTs(NFT[] memory _nfts)
-        public
-        onlyOwner
-    {
+    function depositNFTs(NFT[] memory _nfts) public onlyOwner {
         if (isDrawn) {
             revert Lootbox__AlreadyDrawn();
         }
@@ -100,7 +97,11 @@ contract Lootbox is Ownable, ERC721Holder {
             revert Lootbox__TooManyNFTsDeposited();
         }
         for (uint256 i = 0; i < _nfts.length; i++) {
-            IERC721(_nfts[i]._address).safeTransferFrom(msg.sender, address(this), _nfts[i]._tokenId);
+            IERC721(_nfts[i]._address).safeTransferFrom(
+                msg.sender,
+                address(this),
+                _nfts[i]._tokenId
+            );
             NFTs[numNFT]._address = _nfts[i]._address;
             NFTs[numNFT]._tokenId = _nfts[i]._tokenId;
             ++numNFT;
@@ -148,7 +149,7 @@ contract Lootbox is Ownable, ERC721Holder {
         if (PandoraTicket(ticket).isClaimed(_ticketId)) {
             revert Lootbox__Unauthorized();
         }
-        
+
         IERC721(NFTs[wonTicket[_ticketId]]._address).safeTransferFrom(
             address(this),
             msg.sender,
@@ -178,5 +179,13 @@ contract Lootbox is Ownable, ERC721Holder {
                 NFTs[i]._tokenId
             );
         }
+    }
+
+    function getAllNFTs() public view returns (NFT[] memory) {
+        NFT[] memory nfts = new NFT[](numNFT);
+        for (uint256 i = 0; i < numNFT; i++) {
+            nfts[i] = NFTs[i];
+        }
+        return nfts;
     }
 }

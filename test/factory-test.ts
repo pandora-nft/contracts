@@ -88,6 +88,13 @@ describe("LootboxFactory", function () {
     it("Lootbox variable deployed correctly", async function () {
       expect(await lootbox.drawTimestamp()).to.equal(drawTime);
     });
+
+    it("Should get all loot boxes attributes", async function () {
+      expect(await lootboxFactory.allLootboxes(0)).to.equal(lootboxAddress);
+      const lootboxes = await lootboxFactory.getAllLootboxes();
+      expect(lootboxes.length).to.equal(1);
+      expect(lootboxes[0]).to.equal(lootboxAddress);
+    });
   });
   //TODO test more about buying ticket
   describe("Try minting 2 tickets", function () {
@@ -115,20 +122,25 @@ describe("LootboxFactory", function () {
       await ticket
         .connect(accounts[1])
         .setApprovalForAll(lootbox.address, true);
-      const tx = await lootbox
-        .connect(accounts[1])
-        .depositNFTs(ticket.address, [2, 3]);
+      const tx = await lootbox.connect(accounts[1]).depositNFTs([
+        [ticket.address, 2],
+        [ticket.address, 3],
+      ]);
       const receipt = await tx.wait();
-      console.log("receipt", receipt);
+      // console.log("receipt", receipt);
     });
     it("NFT should be in lootbox", async function () {
       expect(await ticket.balanceOf(lootboxAddress)).to.equal(2);
     });
 
-    // it("Should get all NFTs in the lootbox", async function () {
-    //   const x = await lootbox.getAllNFTs();
-    //   console.log("xxx", x);
-    //   expect(1).to.equal(2);
-    // });
+    // TODO: should seperate test files for lootbox
+    it("Should get all NFTs in the lootbox", async function () {
+      const nfts = await lootbox.getAllNFTs();
+      expect(nfts.length).to.equal(2);
+      expect(nfts[0]._address).to.equal(ticket.address);
+      expect(nfts[0]._tokenId).to.equal(2);
+      expect(nfts[1]._address).to.equal(ticket.address);
+      expect(nfts[1]._tokenId).to.equal(3);
+    });
   });
 });
