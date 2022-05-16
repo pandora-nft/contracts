@@ -41,21 +41,22 @@ async function main() {
   console.log("lootboxFactory deployed at:", lootboxFactory.address);
   console.log("ticket Address", await lootboxFactory.ticketAddress());
   // Top up with LINK Token
-  // await linkToken.transfer(lootboxFactory.address, ethers.utils.parseEther("1"));
+  await linkToken.transfer(lootboxFactory.address, ethers.utils.parseEther("1"));
   // await lootboxFactory.topUpSubscription(
   //   ethers.utils.parseEther("1")
   // )
 
-  // const drawTime = Math.floor(Date.now() / 1000) + 3600*24;
-  // await lootboxFactory["deployLootbox(string,uint256,uint256,uint256)"](
-  //   "Test lootbox",
-  //   drawTime,
-  //   ethers.utils.parseEther("0.01"),
-  //   ethers.utils.parseEther("0")
-  // );
-  // const lootboxAddress = await lootboxFactory.lootboxAddress("0");
+  const drawTime = Math.floor(Date.now() / 1000) + 3600*24*7;
+  await lootboxFactory["deployLootbox(string,uint256,uint256,uint256)"](
+    "Test lootbox",
+    drawTime,
+    ethers.utils.parseEther("0.01"),
+    ethers.utils.parseEther("0")
+  );
 
-  // console.log("lootbox 0 deployed at", lootboxAddress);
+  const lootboxAddress = await lootboxFactory.lootboxAddress(0);
+
+  console.log("lootbox 0 deployed at", lootboxAddress);
 
 
 

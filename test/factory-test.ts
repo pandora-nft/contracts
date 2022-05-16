@@ -68,13 +68,6 @@ describe("LootboxFactory", function () {
       );
       expect(await pandoraTicket.owner()).to.equal(deployerAddress);
     });
-
-    it("Should get all loot boxes attributes", async function () {
-      expect(await lootboxFactory.allLootboxes(0)).to.equal(lootboxAddress);
-      const lootboxes = await lootboxFactory.getAllLootboxes();
-      expect(lootboxes.length).to.equal(1);
-      expect(lootboxes[0]).to.equal(lootboxAddress);
-    });
   });
 
   describe("Lootbox variable", function () {
@@ -126,10 +119,16 @@ describe("LootboxFactory", function () {
         .connect(accounts[1])
         .depositNFTs(ticket.address, [2, 3]);
       const receipt = await tx.wait();
-      console.log(receipt);
+      console.log("receipt", receipt);
     });
     it("NFT should be in lootbox", async function () {
       expect(await ticket.balanceOf(lootboxAddress)).to.equal(2);
     });
+
+    // it("Should get all NFTs in the lootbox", async function () {
+    //   const x = await lootbox.getAllNFTs();
+    //   console.log("xxx", x);
+    //   expect(1).to.equal(2);
+    // });
   });
 });
