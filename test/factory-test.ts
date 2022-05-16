@@ -104,8 +104,10 @@ describe("LootboxFactory", function () {
                 });
             await ticket.connect(accounts[1]).setApprovalForAll(lootbox.address, true);
             const tx = await lootbox.connect(accounts[1]).depositNFTs(
-                ticket.address,
-                [2,3],
+                [
+                    [ticket.address, 2],
+                    [ticket.address, 3],
+                ]
             )
             const receipt = await tx.wait();
             console.log(receipt);
