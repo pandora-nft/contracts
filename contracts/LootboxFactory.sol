@@ -230,4 +230,19 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
     function getAllLootboxes() public view returns (address[] memory) {
         return allLootboxes;
     }
+
+    function getLootboxesOwnedByUser(address _user)
+        public
+        view
+        returns (address[] memory)
+    {
+        uint256[] memory lootboxIds = getLootboxOwned(_user);
+
+        address[] memory lootboxes = new address[](lootboxIds.length);
+        for (uint256 i = 0; i < lootboxIds.length; i++) {
+            uint256 lootboxId = lootboxIds[i];
+            lootboxes[i] = allLootboxes[lootboxId];
+        }
+        return lootboxes;
+    }
 }
