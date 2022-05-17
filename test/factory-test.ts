@@ -25,10 +25,13 @@ describe("LootboxFactory", function () {
 
   let lootboxFactory: Contract;
   let lootbox: Contract;
+  let lootbox2: Contract;
   let ticket: Contract;
 
   let lootboxAddress: string;
+  let lootboxAddress2: string;
   let drawTime: number;
+  let drawTime2: number;
   before(async function () {
     accounts = await ethers.getSigners();
     chainId = network.config.chainId;
@@ -41,6 +44,9 @@ describe("LootboxFactory", function () {
     );
     await lootboxFactory.deployed();
     drawTime = Math.floor(Date.now() / 1000) + 3600;
+    drawTime2 = Math.floor(Date.now() / 1000) + 7200;
+
+    // first lootbox ====================================
     await lootboxFactory
       .connect(accounts[1])
       ["deployLootbox(string,uint256,uint256,uint256)"](
@@ -51,11 +57,27 @@ describe("LootboxFactory", function () {
       );
     lootboxAddress = await lootboxFactory.lootboxAddress("0");
     lootbox = await ethers.getContractAt("Lootbox", lootboxAddress);
+    // ======================================================
+
     ticket = await ethers.getContractAt(
       "PandoraTicket",
       await lootboxFactory.ticketAddress()
     );
+
+    // second lootbox ====================================
+    await lootboxFactory
+      .connect(accounts[2])
+      ["deployLootbox(string,uint256,uint256,uint256)"](
+        "Test lootbox 2",
+        drawTime2,
+        ethers.utils.parseEther("0.01"),
+        ethers.utils.parseEther("0")
+      );
+    lootboxAddress2 = await lootboxFactory.lootboxAddress("1");
+    lootbox2 = await ethers.getContractAt("Lootbox", lootboxAddress2);
+    // ======================================================
   });
+
   describe("Check variables", function () {
     it("Should set lootbox owner to deployer", async function () {
       expect(await lootboxFactory.owner()).to.equal(deployerAddress);
@@ -72,30 +94,53 @@ describe("LootboxFactory", function () {
 
   describe("Lootbox variable", function () {
     it("Total lootbox should increase", async function () {
-      expect(await lootboxFactory.totalLootbox()).to.equal("1");
+      expect(await lootboxFactory.totalLootbox()).to.equal("2");
     });
 
     it("Correct lootbox name", async function () {
       expect(await lootboxFactory.getLootboxName("0")).to.equal("Test lootbox");
+      expect(await lootboxFactory.getLootboxName("1")).to.equal(
+        "Test lootbox 2"
+      );
     });
 
-    it("lootbox Owned should increase", async function () {
-      expect(
-        (await lootboxFactory.getLootboxOwned(accounts[1].address)).length
-      ).to.equal(1);
-    });
+    // it("lootbox Owned should increase", async function () {
+    //   expect(
+    //     (await lootboxFactory.getLootboxOwned(accounts[1].address)).length
+    //   ).to.equal(1);
+    //   expect(
+    //     (await lootboxFactory.getLootboxOwned(accounts[2].address)).length
+    //   ).to.equal(1);
+    // });
 
     it("Lootbox variable deployed correctly", async function () {
       expect(await lootbox.drawTimestamp()).to.equal(drawTime);
+      expect(await lootbox2.drawTimestamp()).to.equal(drawTime2);
     });
 
-    it("Should get all loot boxes attributes", async function () {
+    it("Should get all lootboxes in the factory", async function () {
       expect(await lootboxFactory.allLootboxes(0)).to.equal(lootboxAddress);
       const lootboxes = await lootboxFactory.getAllLootboxes();
-      expect(lootboxes.length).to.equal(1);
+      expect(lootboxes.length).to.equal(2);
       expect(lootboxes[0]).to.equal(lootboxAddress);
+      expect(lootboxes[1]).to.equal(lootboxAddress2);
+    });
+
+    it("Should get lootboxes owned by user", async function () {
+      const lootboxesOfAccount1 = await lootboxFactory.getLootboxesOwnedByUser(
+        accounts[1].address
+      );
+      const lootboxesOfAccount2 = await lootboxFactory.getLootboxesOwnedByUser(
+        accounts[2].address
+      );
+
+      expect(lootboxesOfAccount1.length).to.equal(1);
+      expect(lootboxesOfAccount2.length).to.equal(1);
+      expect(lootboxesOfAccount1[0]).to.equal(lootboxAddress);
+      expect(lootboxesOfAccount2[0]).to.equal(lootboxAddress2);
     });
   });
+
   //TODO test more about buying ticket
   describe("Try minting 2 tickets", function () {
     before(async function () {
@@ -136,6 +181,7 @@ describe("LootboxFactory", function () {
     // TODO: should seperate test files for lootbox
     it("Should get all NFTs in the lootbox", async function () {
       const nfts = await lootbox.getAllNFTs();
+      console.log("nfts", nfts);
       expect(nfts.length).to.equal(2);
       expect(nfts[0]._address).to.equal(ticket.address);
       expect(nfts[0]._tokenId).to.equal(2);

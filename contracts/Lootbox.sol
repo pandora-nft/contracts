@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "./LootboxFactory.sol";
 import "./PandoraTicket.sol";
+
 error Lootbox__Unauthorized();
 error Lootbox__AlreadyDrawn();
 error Lootbox__NotDrawnYet();

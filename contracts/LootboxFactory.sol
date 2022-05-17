@@ -10,6 +10,8 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "./Lootbox.sol";
 import "./PandoraTicket.sol";
 
+error LootboxFactory__Unauthorized();
+
 contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
     // see https://docs.chain.link/docs/vrf-contracts/#configurations
     VRFCoordinatorV2Interface COORDINATOR;
@@ -64,14 +66,6 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
 
     function ticketAddress() public view returns (address) {
         return address(ticket);
-    }
-
-    function getLootboxOwned(address _owner)
-        public
-        view
-        returns (uint256[] memory)
-    {
-        return lootboxOwned[_owner];
     }
 
     // VRF
@@ -199,7 +193,7 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
         uint256 _lootboxId
     ) public {
         if (msg.sender != lootboxAddress[_lootboxId]) {
-            revert("Unauthorized");
+            revert LootboxFactory__Unauthorized();
         }
         ticket.mint(_to, _amount, _lootboxId);
     }
@@ -208,26 +202,41 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
         public
     {
         if (msg.sender != lootboxAddress[_lootboxId]) {
-            revert("Unauthorized");
+            revert LootboxFactory__Unauthorized();
         }
         ticket.refundTicket(_tokenIds);
     }
 
     function setWinner(uint256 _tokenId, uint256 _lootboxId) public {
         if (msg.sender != lootboxAddress[_lootboxId]) {
-            revert("Unauthorized");
+            revert LootboxFactory__Unauthorized();
         }
         ticket.setWinner(_tokenId);
     }
 
     function setClaim(uint256 _tokenId, uint256 _lootboxId) public {
         if (msg.sender != lootboxAddress[_lootboxId]) {
-            revert("Unauthorized");
+            revert LootboxFactory__Unauthorized();
         }
         ticket.setClaim(_tokenId);
     }
 
     function getAllLootboxes() public view returns (address[] memory) {
         return allLootboxes;
+    }
+
+    function getLootboxesOwnedByUser(address _user)
+        public
+        view
+        returns (address[] memory)
+    {
+        uint256[] memory lootboxIds = lootboxOwned[_user];
+
+        address[] memory lootboxes = new address[](lootboxIds.length);
+        for (uint256 i = 0; i < lootboxIds.length; i++) {
+            uint256 lootboxId = lootboxIds[i];
+            lootboxes[i] = allLootboxes[lootboxId];
+        }
+        return lootboxes;
     }
 }
