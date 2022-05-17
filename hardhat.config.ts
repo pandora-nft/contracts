@@ -32,6 +32,7 @@ export default {
         url: process.env.RINKEBY_URL as string,
         address: "test test test test test test test test test test test junk",
       },
+      // allowUnlimitedContractSize: true,
     },
     rinkeby: {
       url: process.env.RINKEBY_URL || "",
