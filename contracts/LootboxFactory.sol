@@ -110,7 +110,7 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
     }
 
     //TODO Register Upkeep
-    function checkUpkeep(bytes calldata checkData)
+    function checkUpkeep(bytes calldata /*checkData*/)
         external
         view
         override
@@ -234,8 +234,7 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
 
         address[] memory lootboxes = new address[](lootboxIds.length);
         for (uint256 i = 0; i < lootboxIds.length; i++) {
-            uint256 lootboxId = lootboxIds[i];
-            lootboxes[i] = allLootboxes[lootboxId];
+            lootboxes[i] = lootboxAddress[lootboxIds[i]];
         }
         return lootboxes;
     }

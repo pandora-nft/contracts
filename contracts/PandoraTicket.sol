@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
 import "./LootboxFactory.sol";
+import "./Lootbox.sol";
 
 error Ticket__Unauthorized();
 
@@ -20,10 +21,11 @@ contract PandoraTicket is ERC721Enumerable, Ownable {
     mapping(uint256 => bool) public isClaimed;
 
     Counters.Counter public tokenIdCounter;
-    string public imageURI =
+    string imageURI =
         "ipfs://bafkreigm5ir7vyiricnl23a7bbbzi3ve2tr6v54pi2qusvfuy2rlduc3we";
-    string public winnerImageURI = 
+    string winnerImageURI =
         "ipfs://bafybeiav77v34ln72vbnozprkzfloqvtwlb5eaohintkjivap2tp4gtqdi";
+
     constructor(address _factory) ERC721("The Pandora Ticket", "PANDORA") {
         factory = LootboxFactory(_factory);
     }
@@ -54,6 +56,14 @@ contract PandoraTicket is ERC721Enumerable, Ownable {
                                 ": ",
                                 factory.getLootboxName(lootboxIds[tokenId]),
                                 "! You have a chance to win prizes inside the Pandora Box!",
+                                '", "isWinner": "',
+                                isWinner[tokenId],
+                                '", "isRefunded": "',
+                                isRefunded[tokenId],
+                                '", "drawTimestamp":"',
+                                Lootbox(
+                                    factory.lootboxAddress(lootboxIds[tokenId])
+                                ).drawTimestamp(),
                                 '", "image": "',
                                 _imageURI,
                                 '"}'
@@ -101,7 +111,7 @@ contract PandoraTicket is ERC721Enumerable, Ownable {
         if (msg.sender != address(factory)) {
             revert Ticket__Unauthorized();
         }
-        if(isWinner[_tokenId]==false){
+        if (isWinner[_tokenId] == false) {
             revert Ticket__Unauthorized();
         }
         isClaimed[_tokenId] = true;

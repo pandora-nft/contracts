@@ -24,7 +24,15 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // Go to https://hardhat.org/config/ to learn more
 
 export default {
-  solidity: "0.8.7",
+  solidity: {
+    version: "0.8.7",
+    // settings: {
+    //       optimizer: {
+    //             enabled: true,
+    //             runs: 200,
+    //       },
+    // },
+  },
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
@@ -32,7 +40,6 @@ export default {
         url: process.env.RINKEBY_URL as string,
         address: "test test test test test test test test test test test junk",
       },
-      // allowUnlimitedContractSize: true,
     },
     rinkeby: {
       url: process.env.RINKEBY_URL || "",
