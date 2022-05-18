@@ -7,11 +7,13 @@ async function main() {
   const lootbox = await ethers.getContractAt("Lootbox", TEST_LOOTBOX[chainId!]);
   const ticket = await ethers.getContractAt("PandoraTicket", TICKET[chainId!]);
   
-  await ticket.setApprovalForAll(
+  const approval = await ticket.setApprovalForAll(
     TEST_LOOTBOX[chainId!],
     true
   )
-
+  
+  await approval.wait();
+  
   await lootbox.depositNFTs(
       [
           [TICKET[chainId!],0],

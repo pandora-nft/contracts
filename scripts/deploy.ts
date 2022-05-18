@@ -46,15 +46,16 @@ async function main() {
   //   ethers.utils.parseEther("1")
   // )
 
-  const drawTime = Math.floor(Date.now() / 1000) + 3600*24*7;
-  await lootboxFactory["deployLootbox(string,uint256,uint256,uint256)"](
+  const drawTime = Math.floor(Date.now() / 1000) + 3600 * 24 * 7;
+  const tx = await lootboxFactory["deployLootbox(string,uint256,uint256,uint256)"](
     "Test lootbox",
     drawTime,
     ethers.utils.parseEther("0.01"),
     ethers.utils.parseEther("0")
   );
+  await tx.wait();
 
-  const lootboxAddress = await lootboxFactory.lootboxAddress(0);
+  const lootboxAddress = (await lootboxFactory.functions.lootboxAddress(0))[0];
 
   console.log("lootbox 0 deployed at", lootboxAddress);
 

@@ -30,6 +30,14 @@ contract PandoraTicket is ERC721Enumerable, Ownable {
         factory = LootboxFactory(_factory);
     }
 
+    function boolToInt(bool _bool) internal view returns (uint256) {
+        if (_bool) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
     //!Please ignore Linter error below
     function tokenURI(uint256 tokenId)
         public
@@ -57,13 +65,19 @@ contract PandoraTicket is ERC721Enumerable, Ownable {
                                 factory.getLootboxName(lootboxIds[tokenId]),
                                 "! You have a chance to win prizes inside the Pandora Box!",
                                 '", "isWinner": "',
-                                isWinner[tokenId],
+                                Strings.toString(boolToInt(isWinner[tokenId])),
                                 '", "isRefunded": "',
-                                isRefunded[tokenId],
+                                Strings.toString(
+                                    boolToInt(isRefunded[tokenId])
+                                ),
                                 '", "drawTimestamp":"',
-                                Lootbox(
-                                    factory.lootboxAddress(lootboxIds[tokenId])
-                                ).drawTimestamp(),
+                                Strings.toString(
+                                    Lootbox(
+                                        factory.lootboxAddress(
+                                            lootboxIds[tokenId]
+                                        )
+                                    ).drawTimestamp()
+                                ),
                                 '", "image": "',
                                 _imageURI,
                                 '"}'
