@@ -4,7 +4,7 @@ export const TICKET: { [chainId: number]: string } = {
     //BNB Testnet
     97: "0x36DF42342293ab2fbff56360dAb65498f1675156",
     //Mumbai
-    80001: "0xe102a357f5d40BD3c1D331BDFF5f37aAdaDa2467",
+    80001: "0xd83281072244164bbe9217f1EeA98D7229EBCCA8",
 
     //BNB Chain
     // 56: "",
@@ -18,7 +18,7 @@ export const LOOTBOX_FACTORY: { [chainId: number]: string } = {
     //BNB Testnet
     97: "0x5dA7a5af90fe291cE1bef49C819273A78F82D450",
     //Mumbai
-    80001: "0xce0B8f10cBb1b51f345f46EAab16abd104aD0D7F",
+    80001: "0xA9Fe6ad0e6Aff73b46C5e3E69ec90A05cc7603e3",
 
     //BNB Chain
     // 56: "",
@@ -32,7 +32,7 @@ export const TEST_LOOTBOX: { [chainId: number]: string } = {
     //BNB Testnet
     97: "0x24Fd4716985DAee8cDcaACDC5B3A06F15b498374",
     //Mumbai
-    80001: "0xfdF784C6EdFa89e8304BD991c429118c4682f47C",
+    80001: "0x72967D8fF07BA40De2c8EB26A468fFc3A83cf1eC",
     
     //BNB Chain
     // 56: "",

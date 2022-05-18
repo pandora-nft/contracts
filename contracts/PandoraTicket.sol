@@ -56,7 +56,7 @@ contract PandoraTicket is ERC721Enumerable, Ownable {
                     Base64.encode(
                         bytes(
                             abi.encodePacked(
-                                '{"name":"The Pandora Ticket #"',
+                                '{"name":"The Pandora Ticket #',
                                 Strings.toString(tokenId),
                                 '", "description":"',
                                 "This ticket is generated from Lootbox #",
