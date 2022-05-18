@@ -39,3 +39,17 @@ export const TEST_LOOTBOX: { [chainId: number]: string } = {
     //Polygon Mainnet
     // 137: "",
 }
+
+export const MOCK_NFT: { [chainId: number]: string } = {
+    //Rinkeby
+    // 4: "",
+    //BNB Testnet
+    // 97:"",
+    //Mumbai
+    80001: "0x4a00c47eBD3E5fC7Bcb0d1be973450B2D2aAE5e6",
+    
+    //BNB Chain
+    // 56: "",
+    //Polygon Mainnet
+    // 137: "",
+}
