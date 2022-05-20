@@ -30,6 +30,22 @@ contract PandoraTicket is ERC721Enumerable, Ownable {
         factory = LootboxFactory(_factory);
     }
 
+    function getTicketsForLootbox(uint256 lootboxId) public view returns (uint256[] memory) {
+        return ticketIds[lootboxId];
+    }
+
+    function getOwnTicketsForLootbox(uint256 lootboxId) public view returns (uint256[] memory) {
+        uint256[] memory tickets = getTicketsForLootbox(lootboxId);
+        uint256[] memory ownTickets = new uint256[](tickets.length);
+        uint256 count=0;
+        for (uint256 i; i<tickets.length; i++) {
+            if (ownerOf(tickets[i]) == msg.sender) {
+                ownTickets[count] = tickets[i];
+                ++count;
+            }
+        }
+        return ownTickets;
+    }
     function boolToInt(bool _bool) internal view returns (uint256) {
         if (_bool) {
             return 1;
