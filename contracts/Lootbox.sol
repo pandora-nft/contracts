@@ -41,6 +41,8 @@ contract Lootbox is Ownable, ERC721Holder {
     mapping(uint256 => uint256) public winners;
     mapping(uint256 => uint256) public wonTicket;
 
+    event NFTSDeposited(NFT[] nfts);
+    event Drawn(uint256[] winnerTickets);
     constructor(
         string memory _name,
         uint256 _id,
@@ -73,6 +75,7 @@ contract Lootbox is Ownable, ERC721Holder {
         if (ticketSold <= minimumTicketRequired || ticketSold < numNFT) {
             isRefundable = true;
         } else {
+            uint256[] memory _winners = new uint256[](numNFT);
             uint256 i = 0;
             while (i < numNFT) {
                 uint256 winnerTicketId = PandoraTicket(ticket).ticketIds(
@@ -83,9 +86,11 @@ contract Lootbox is Ownable, ERC721Holder {
                     LootboxFactory(factory).setWinner(winnerTicketId, id);
                     winners[i] = winnerTicketId;
                     wonTicket[winnerTicketId] = i;
+                    _winners[i] = winnerTicketId;
                     i++;
                 }
             }
+            emit Drawn(_winners);
         }
         isDrawn = true;
     }
@@ -107,6 +112,7 @@ contract Lootbox is Ownable, ERC721Holder {
             NFTs[numNFT]._tokenId = _nfts[i]._tokenId;
             ++numNFT;
         }
+        emit NFTSDeposited(_nfts);
     }
 
     function buyTickets(uint256 _amount) public payable {

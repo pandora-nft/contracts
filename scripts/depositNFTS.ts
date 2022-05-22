@@ -22,10 +22,10 @@ async function main() {
         // [TICKET[chainId!], 0],
         // [TICKET[chainId!], 1],
         //mockNFT on mumbai
-        [MOCK_NFT[chainId!], 19],
-        [MOCK_NFT[chainId!], 29],
-        [MOCK_NFT[chainId!], 27],
-        [MOCK_NFT[chainId!], 26],
+        [MOCK_NFT[chainId!], 1],
+        [MOCK_NFT[chainId!], 2],
+        [MOCK_NFT[chainId!], 3],
+        [MOCK_NFT[chainId!], 4],
 
       ]
     ).then(console.log())

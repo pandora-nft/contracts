@@ -28,7 +28,7 @@ contract SuperRare is ERC721Enumerable, Ownable {
             string(
                 abi.encodePacked(
                     mockTokenURI[tokenId % mockTokenURI.length],
-                    Strings.toString(tokenId)
+                    Strings.toString(tokenId*12%512+1)
                 )
             );
     }
