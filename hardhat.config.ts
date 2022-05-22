@@ -39,10 +39,10 @@ export default {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      // forking: {
-      //   url: process.env.RINKEBY_URL as string,
-      //   address: "test test test test test test test test test test test junk",
-      // },
+      forking: {
+        url: process.env.RINKEBY_URL as string,
+        address: "test test test test test test test test test test test junk",
+      },
     },
     rinkeby: {
       url: process.env.RINKEBY_URL || "",
