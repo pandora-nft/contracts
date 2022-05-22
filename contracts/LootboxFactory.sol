@@ -41,7 +41,7 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
 
     // map lootbox to requestIds
     mapping(uint256 => uint256) private s_lootbox;
-
+    event LootboxDeployed(uint256 indexed lootboxId, address indexed lootboxAddress, address owner);
     constructor(
         address _vrfCoordinator,
         address _linkTokenContract,
@@ -162,6 +162,7 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
         lootboxAddress[totalLootbox] = address(lootbox);
         lootboxOwned[msg.sender].push(totalLootbox);
         allLootboxes.push(address(lootbox));
+        emit LootboxDeployed(totalLootbox, address(lootbox), msg.sender);
         totalLootbox++;
     }
 
@@ -184,6 +185,7 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
         lootboxAddress[totalLootbox] = address(lootbox);
         lootboxOwned[msg.sender].push(totalLootbox);
         allLootboxes.push(address(lootbox));
+        emit LootboxDeployed(totalLootbox, address(lootbox), msg.sender);
         totalLootbox++;
     }
 
