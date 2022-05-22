@@ -172,21 +172,13 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
         uint256 _ticketPrice,
         uint256 _minimumTicketRequired
     ) public {
-        Lootbox lootbox = new Lootbox(
+        deployLootbox(
             _name,
-            totalLootbox,
             _drawTimestamp,
             _ticketPrice,
             _minimumTicketRequired,
-            type(uint256).max,
-            address(ticket)
+            type(uint256).max
         );
-        lootbox.transferOwnership(msg.sender);
-        lootboxAddress[totalLootbox] = address(lootbox);
-        lootboxOwned[msg.sender].push(totalLootbox);
-        allLootboxes.push(address(lootbox));
-        emit LootboxDeployed(totalLootbox, address(lootbox), msg.sender);
-        totalLootbox++;
     }
 
     function mintTicket(

@@ -46,7 +46,7 @@ contract PandoraTicket is ERC721Enumerable, Ownable {
         }
         return ownTickets;
     }
-    function boolToInt(bool _bool) internal view returns (uint256) {
+    function boolToInt(bool _bool) internal pure returns (uint256) {
         if (_bool) {
             return 1;
         } else {

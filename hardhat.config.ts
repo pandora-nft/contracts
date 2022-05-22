@@ -26,20 +26,23 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 export default {
   solidity: {
     version: "0.8.7",
-    // settings: {
-    //       optimizer: {
-    //             enabled: true,
-    //             runs: 200,
-    //       },
-    // },
+    settings: {
+          optimizer: {
+                enabled: true,
+                runs: 200,
+                details: {
+                  yul: false
+                }
+          },
+    },
   },
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      forking: {
-        url: process.env.RINKEBY_URL as string,
-        address: "test test test test test test test test test test test junk",
-      },
+      // forking: {
+      //   url: process.env.RINKEBY_URL as string,
+      //   address: "test test test test test test test test test test test junk",
+      // },
     },
     rinkeby: {
       url: process.env.RINKEBY_URL || "",
@@ -66,6 +69,16 @@ export default {
       chainId: 56,
       accounts: [process.env.PRIVATE_KEY],
     },
+    avax: {
+      url: process.env.AVAX_URL || "",
+      chainId: 43114,
+      accounts: [process.env.PRIVATE_KEY],
+    },
+    fuji: {
+      url: process.env.FUJI_URL || "",
+      chainId: 43113,
+      accounts: [process.env.PRIVATE_KEY],
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
@@ -74,8 +87,13 @@ export default {
   etherscan: {
     apiKey: {
       rinkeby: process.env.ETHERSCAN_API_KEY,
+      bsc: process.env.BSCSCAN_API_KEY,    
       bscTestnet: process.env.BSCSCAN_API_KEY,
       polygon: process.env.POLYGONSCAN_API_KEY,
+      polygonMumbai: process.env.POLYGONSCAN_API_KEY,
+      avalanche: process.env.SNOWTRACE_API_KEY,
+      avalancheFujiTestnet: process.env.SNOWTRACE_API_KEY,
+
     },
   },
   // docgen: {

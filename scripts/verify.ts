@@ -4,6 +4,7 @@
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 import { ethers, network } from "hardhat";
+import { LOOTBOX_FACTORY, TEST_LOOTBOX, TICKET } from "../constants/address";
 const hre = require("hardhat");
 import { VRF_COORDINATOR, LINK_TOKEN, GAS_LANE } from "../constants/chainlink";
 async function main() {
@@ -30,40 +31,12 @@ async function main() {
     linkTokenAddress = LINK_TOKEN[chainId!];
     gasLane = GAS_LANE[chainId!];
   }
-  // We get the contract to deploy
-  const LootboxFactory = await ethers.getContractFactory("LootboxFactory");
-  const lootboxFactory = await LootboxFactory.deploy(
-    vrfCoordinatorV2Address,
-    linkTokenAddress,
-    gasLane,
-  );
-  await lootboxFactory.deployed();
-  const linkToken = await ethers.getContractAt("LinkTokenInterface", linkTokenAddress);
-  const ticketAddress = await lootboxFactory.ticketAddress();
-  console.log("lootboxFactory deployed at:", lootboxFactory.address);
-  console.log("ticket Address", ticketAddress);
-  // Top up with LINK Token
-  await linkToken.transfer(lootboxFactory.address, ethers.utils.parseEther("1"));
-  // await lootboxFactory.topUpSubscription(
-  //   ethers.utils.parseEther("1")
-  // )
-
-  const drawTime = Math.floor(Date.now() / 1000) + 3600 * 8;
+  // Input
+  const lootbox = await ethers.getContractAt("Lootbox", TEST_LOOTBOX[chainId!]);
   const boxName = "Hype"
-  const tx = await lootboxFactory["deployLootbox(string,uint256,uint256,uint256)"](
-    boxName,
-    drawTime,
-    ethers.utils.parseEther("0.01"),
-    ethers.utils.parseEther("0")
-  );
-  await tx.wait();
-
-  const lootboxAddress = (await lootboxFactory.functions.lootboxAddress(0))[0];
-
-  console.log("lootbox 0 deployed at", lootboxAddress);
 
   await hre.run("verify:verify", {
-    address: lootboxFactory.address,
+    address: LOOTBOX_FACTORY[chainId!],
     constructorArguments: [
       vrfCoordinatorV2Address,
       linkTokenAddress,
@@ -72,22 +45,22 @@ async function main() {
   });
 
   await hre.run("verify:verify", {
-    address: lootboxAddress,
+    address: TEST_LOOTBOX[chainId!],
     constructorArguments: [
       boxName,
       0,
-      drawTime,
+      await lootbox.drawTimestamp(),
       ethers.utils.parseEther("0.01"),
       ethers.utils.parseEther("0"),
       ethers.constants.MaxUint256,
-      ticketAddress,
+      TICKET[chainId!],
     ],
   })
 
   await hre.run("verify:verify", {
-    address: ticketAddress,
+    address: TICKET[chainId!],
     constructorArguments: [
-      lootboxFactory.address
+      LOOTBOX_FACTORY[chainId!],
     ],
   })
 }
