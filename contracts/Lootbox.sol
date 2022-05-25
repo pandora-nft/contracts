@@ -41,8 +41,6 @@ contract Lootbox is Ownable, ERC721Holder {
     mapping(uint256 => uint256) public winners;
     mapping(uint256 => uint256) public wonTicket;
 
-    event NFTSDeposited(NFT[] nfts);
-    event Drawn(uint256[] winnerTickets);
     constructor(
         string memory _name,
         uint256 _id,
@@ -62,7 +60,7 @@ contract Lootbox is Ownable, ERC721Holder {
         ticket = _ticket;
     }
 
-    function draw(uint256[] memory _randomWords) public {
+    function draw(uint256[] memory _randomWords) public returns (uint256[] memory) {
         if (msg.sender != factory) {
             revert Lootbox__Unauthorized();
         }
@@ -90,9 +88,10 @@ contract Lootbox is Ownable, ERC721Holder {
                     i++;
                 }
             }
-            emit Drawn(_winners);
+            return _winners;
         }
         isDrawn = true;
+        return new uint256[](0);
     }
 
     function depositNFTs(NFT[] memory _nfts) public onlyOwner {
@@ -112,7 +111,8 @@ contract Lootbox is Ownable, ERC721Holder {
             NFTs[numNFT]._tokenId = _nfts[i]._tokenId;
             ++numNFT;
         }
-        emit NFTSDeposited(_nfts);
+
+        LootboxFactory(factory).depositNFT(_nfts, id);
     }
 
     function buyTickets(uint256 _amount) public payable {

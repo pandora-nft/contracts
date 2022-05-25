@@ -17,31 +17,26 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
     VRFCoordinatorV2Interface COORDINATOR;
     LinkTokenInterface LINKTOKEN;
     PandoraTicket ticket;
+    
     mapping(uint256 => address) public lootboxAddress;
     mapping(address => uint256[]) public lootboxOwned;
+
     address[] public allLootboxes;
     uint256 public totalLootbox = 0;
+
     uint64 public s_subscriptionId;
-
-    // The gas lane to use, which specifies the maximum gas price to bump to.
-    // For a list of available gas lanes on each network,
-    // see https://docs.chain.link/docs/vrf-contracts/#configurations
     bytes32 immutable gasLane;
-
-    // Depends on the number of requested values that you want sent to the
-    // fulfillRandomWords() function. Storing each word costs about 20,000 gas,
-    // so 40,000 is a safe default for this example contract. Test and adjust
-    // this limit based on the network that you select, the size of the request,
-    // and the processing of the callback request in the fulfillRandomWords()
-    // function.
     uint32 immutable callbackGasLimit = 500000;
-
-    // The default is 3, but you can set this higher.
     uint16 constant REQUEST_CONFIRMATIONS = 3;
 
     // map lootbox to requestIds
     mapping(uint256 => uint256) private s_lootbox;
-    event LootboxDeployed(uint256 indexed lootboxId, address indexed lootboxAddress, address owner);
+
+    event LootboxDeployed(uint256 indexed lootboxId, address lootboxAddress, address owner);
+    event Drawn(uint256 indexed lootboxId, address lootboxAddress, uint256[] winners);
+    event Refunded(uint256[] tokenIds, uint256 lootboxId);
+    event Claimed(uint256 indexed tokenId, uint256 indexed lootboxId);
+    event NFTDeposited(Lootbox.NFT[] nfts, uint256 indexed lootboxId);
     constructor(
         address _vrfCoordinator,
         address _linkTokenContract,
@@ -102,7 +97,8 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
         internal
         override
     {
-        Lootbox(lootboxAddress[s_lootbox[requestId]]).draw(randomWords);
+        uint256[] memory winners = Lootbox(lootboxAddress[s_lootbox[requestId]]).draw(randomWords);
+        emit Drawn(s_lootbox[requestId], lootboxAddress[s_lootbox[requestId]], winners);
     }
 
     function withdrawLink(uint256 amount, address to) external onlyOwner {
@@ -180,7 +176,15 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
             type(uint256).max
         );
     }
-
+    function depositNFT(
+       Lootbox.NFT[] memory _nfts,
+       uint256 _lootboxId
+    ) public {
+        if (msg.sender != lootboxAddress[_lootboxId]) {
+            revert LootboxFactory__Unauthorized();
+        }
+        emit NFTDeposited(_nfts, _lootboxId);
+    }
     function mintTicket(
         address _to,
         uint256 _amount,
@@ -199,6 +203,7 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
             revert LootboxFactory__Unauthorized();
         }
         ticket.refundTicket(_tokenIds);
+        emit Refunded(_tokenIds, _lootboxId);
     }
 
     function setWinner(uint256 _tokenId, uint256 _lootboxId) public {
@@ -213,23 +218,10 @@ contract LootboxFactory is Ownable, KeeperCompatible, VRFConsumerBaseV2 {
             revert LootboxFactory__Unauthorized();
         }
         ticket.setClaim(_tokenId);
+        emit Claimed(_tokenId, _lootboxId);
     }
 
     function getAllLootboxes() public view returns (address[] memory) {
         return allLootboxes;
-    }
-
-    function getLootboxesOwnedByUser(address _user)
-        public
-        view
-        returns (address[] memory)
-    {
-        uint256[] memory lootboxIds = lootboxOwned[_user];
-
-        address[] memory lootboxes = new address[](lootboxIds.length);
-        for (uint256 i = 0; i < lootboxIds.length; i++) {
-            lootboxes[i] = lootboxAddress[lootboxIds[i]];
-        }
-        return lootboxes;
     }
 }

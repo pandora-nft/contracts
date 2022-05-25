@@ -34,35 +34,47 @@ async function main() {
   // Input
   const lootbox = await ethers.getContractAt("Lootbox", TEST_LOOTBOX[chainId!]);
   const boxName = "Hype"
+  try {
 
-  await hre.run("verify:verify", {
-    address: LOOTBOX_FACTORY[chainId!],
-    constructorArguments: [
-      vrfCoordinatorV2Address,
-      linkTokenAddress,
-      gasLane,
-    ],
-  });
+    await hre.run("verify:verify", {
+      address: LOOTBOX_FACTORY[chainId!],
+      constructorArguments: [
+        vrfCoordinatorV2Address,
+        linkTokenAddress,
+        gasLane,
+      ],
+    });
+  } catch {
+    console.log()
+  }
+  try {
 
-  await hre.run("verify:verify", {
-    address: TEST_LOOTBOX[chainId!],
-    constructorArguments: [
-      boxName,
-      0,
-      await lootbox.drawTimestamp(),
-      ethers.utils.parseEther("0.01"),
-      ethers.utils.parseEther("0"),
-      ethers.constants.MaxUint256,
-      TICKET[chainId!],
-    ],
-  })
+    await hre.run("verify:verify", {
+      address: TEST_LOOTBOX[chainId!],
+      constructorArguments: [
+        boxName,
+        0,
+        await lootbox.drawTimestamp(),
+        ethers.utils.parseEther("0.01"),
+        ethers.utils.parseEther("0"),
+        ethers.constants.MaxUint256,
+        TICKET[chainId!],
+      ],
+    })
 
-  await hre.run("verify:verify", {
-    address: TICKET[chainId!],
-    constructorArguments: [
-      LOOTBOX_FACTORY[chainId!],
-    ],
-  })
+  } catch {
+    console.log()
+  }
+  try {
+    await hre.run("verify:verify", {
+      address: TICKET[chainId!],
+      constructorArguments: [
+        LOOTBOX_FACTORY[chainId!],
+      ],
+    })
+  } catch {
+    console.log()
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere

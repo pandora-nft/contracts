@@ -43,7 +43,7 @@ async function main() {
   console.log("lootboxFactory deployed at:", lootboxFactory.address);
   console.log("ticket Address", ticketAddress);
   // Top up with LINK Token
-  await linkToken.transfer(lootboxFactory.address, ethers.utils.parseEther("1"));
+  // await linkToken.transfer(lootboxFactory.address, ethers.utils.parseEther("1"));
   // await lootboxFactory.topUpSubscription(
   //   ethers.utils.parseEther("1")
   // )
