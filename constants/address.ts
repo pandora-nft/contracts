@@ -1,12 +1,12 @@
 export const LOOTBOX_FACTORY: { [chainId: number]: string } = {
     //Rinkeby
-    4: "0x53D5A5Ee0DC444DcB681fF11ae8a630e79F2A577",
+    4: "0xA78AffBFF38e4ae9FD030C52D8eD8a6AFBda9a5D",
     //BNB Testnet
-    97: "0x86490bA09C96F36f288A618E0f11b09A97E427Da",
+    97: "0x48652d6b881b0BA591241c30Fd80e80Cc6624379",
     //Mumbai
-    80001: "0xeE9185C9Bfe2942c2421e82E028192f7a174d96C",
+    80001: "0xEd94c13E344859C9A6b18bF217682a7Aba2eEC2F",
     //Fuji
-    43113: "0xc674C8275Fa1C07b15E5B8B8056984d4940eC2c3",
+    43113: "0x1dF0D95f834864F2fD91be2996cc465960b00AFc",
     //Avalanche
     // 43114: "",
     //BNB Chain
@@ -16,13 +16,13 @@ export const LOOTBOX_FACTORY: { [chainId: number]: string } = {
 }
 export const TICKET: { [chainId: number]: string } = {
     //Rinkeby
-    4: "0xe1B562e5C935f6a9cBB732F97aF3d57ffE3875d0",
+    4: "0xe82967CB8a13Ec6365cd7bFD26457aEdA7DC8Dfb",
     //BNB Testnet
-    97: "0x624b980A80008307939aD769D5e0C2a8C2d25DE1",
+    97: "0xaB62CEd74eC2C52B0A02E118BD51c58f3D1A61cE",
     //Mumbai
-    80001: "0xA584A32D8b72C5FAb6fb8b10d7Ae74241225F8fC",
+    80001: "0x34438266f76F9c82dA25f00946d325E811E9dA25",
     //Fuji
-    43113: "0xf5BF0F9e8741e8d174C2D0DAE2302823Af22d660",
+    43113: "0x35C9b674F856A6Ed52E609A08F257255124D40bA",
     //Avalanche
     // 43114: "",
     //BNB Chain
@@ -34,13 +34,13 @@ export const TICKET: { [chainId: number]: string } = {
 
 export const TEST_LOOTBOX: { [chainId: number]: string } = {
     //Rinkeby
-    4: "0xEe966B1186B829271F0B9760B293d586a806F1F0",
+    4: "0xD378eEFd06C2AFf2e2D33753CaAa07b81b89f3Fc",
     //BNB Testnet
-    97: "0x910cEebd0555d10F1A84a673e924197f0Fdd30Bb",
+    97: "0x4C80700B177cCC7AA490da79862F2E00eb84d36C",
     //Mumbai
-    80001: "0x117A56C5DdEd5a2FD0E5df2088C790bDF8668aC5",
+    80001: "0x800fc31705Be207BF70d40DCb96105B563E9Cc18",
     //Fuji
-    43113: "0x3b5599E8EB7bd1b242EEd2f470D72CaFD1e0d390",
+    43113: "0x4965d1364B14a2aa745F7e8774e30dC9760604Dd",
     //Avalanche
     // 43114: "",   
     //BNB Chain

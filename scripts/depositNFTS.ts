@@ -22,8 +22,8 @@ async function main() {
         // [TICKET[chainId!], 0],
         // [TICKET[chainId!], 1],
         //mockNFT on mumbai
-        [MOCK_NFT[chainId!], 28],
-        [MOCK_NFT[chainId!], 27],
+        // [MOCK_NFT[chainId!], 9],
+        [MOCK_NFT[chainId!], 12],
         // [MOCK_NFT[chainId!], 6],
         // [MOCK_NFT[chainId!], 7],
         // [MOCK_NFT[chainId!], 8],

@@ -60,7 +60,7 @@ contract Lootbox is Ownable, ERC721Holder {
         ticket = _ticket;
     }
 
-    function draw(uint256[] memory _randomWords) public returns (uint256[] memory) {
+    function draw(uint256[] memory _randomWords) public returns (uint256[] memory _winners) {
         if (msg.sender != factory) {
             revert Lootbox__Unauthorized();
         }
@@ -88,6 +88,7 @@ contract Lootbox is Ownable, ERC721Holder {
                     i++;
                 }
             }
+            isDrawn = true;
             return _winners;
         }
         isDrawn = true;
