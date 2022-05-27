@@ -22,9 +22,9 @@ async function main() {
 
   const mockNFT = await MockNFT!.deploy(
     [
-      // "0x31d003F229fabc4dC9404dFFe3FEc2698cc8F0ab",
+      "0x31d003F229fabc4dC9404dFFe3FEc2698cc8F0ab",
       // "0xafF2671aD7129DC23D05F83fF651601e9d1aea0a",
-      "0x5f958971072bf53C4C577b44d7a8a04ADce904Ba",
+      // "0x5f958971072bf53C4C577b44d7a8a04ADce904Ba",
     ],
     40
   );

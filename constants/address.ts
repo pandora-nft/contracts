@@ -2,7 +2,7 @@ export const LOOTBOX_FACTORY: { [chainId: number]: string } = {
     //Rinkeby
     4: "0xA78AffBFF38e4ae9FD030C52D8eD8a6AFBda9a5D",
     //BNB Testnet
-    97: "0x48652d6b881b0BA591241c30Fd80e80Cc6624379",
+    97: "0xc632F5b06C85d8C6ff80Ad858Bb43dd3a86aee06",
     //Mumbai
     80001: "0xEd94c13E344859C9A6b18bF217682a7Aba2eEC2F",
     //Fuji
@@ -18,7 +18,7 @@ export const TICKET: { [chainId: number]: string } = {
     //Rinkeby
     4: "0xe82967CB8a13Ec6365cd7bFD26457aEdA7DC8Dfb",
     //BNB Testnet
-    97: "0xaB62CEd74eC2C52B0A02E118BD51c58f3D1A61cE",
+    97: "0xeE57309b221060F03c96e585d88f7C7B282fc2cf",
     //Mumbai
     80001: "0x34438266f76F9c82dA25f00946d325E811E9dA25",
     //Fuji
@@ -36,7 +36,7 @@ export const TEST_LOOTBOX: { [chainId: number]: string } = {
     //Rinkeby
     4: "0xD378eEFd06C2AFf2e2D33753CaAa07b81b89f3Fc",
     //BNB Testnet
-    97: "0x4C80700B177cCC7AA490da79862F2E00eb84d36C",
+    97: "0xbD705a8512c010DeE7D161eCE0fCA8674681e1CE",
     //Mumbai
     80001: "0x800fc31705Be207BF70d40DCb96105B563E9Cc18",
     //Fuji
