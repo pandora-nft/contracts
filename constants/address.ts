@@ -50,17 +50,12 @@ export const TEST_LOOTBOX: { [chainId: number]: string } = {
 }
 
 export const MOCK_NFT: { [chainId: number]: string } = {
-    //Rinkeby
-    4: "0xe693b227D9534Dbe52535f5a8540355C3bE36e58",
     //BNB Testnet
-    // 97: "0x8c7cf4db37B42cc231B0e821Dae03c842d8D367f",
-    97: "",
+    97: "0xe1EF0CF6fDb12104778D596E943898b64596C7D7",
     //Mumbai
-    // 80001: "0x58c3838c60734deF34B870602a3FB1EC74664536",
-    80001: "0x6c55582a3b6135a02CC983914D8ff273F4CeB1E8",
+    80001: "0xdcE112b4557014b43e63F37A5C7924f19B7001Fa",
     //Fuji
-    // 43113: "0xe693b227D9534Dbe52535f5a8540355C3bE36e58",
-    43113: "",
+    43113: "0x2446784D598c04Cc617E6d17A343c6CCdA133724",
     //Avalanche
     // 43114: "",    
     //BNB Chain
