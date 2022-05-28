@@ -48,19 +48,19 @@ async function main() {
   //   ethers.utils.parseEther("1")
   // )
 
-  const drawTime = Math.floor(Date.now() / 1000) + 3600 * 8;
-  const boxName = "Hype"
-  const tx = await lootboxFactory["deployLootbox(string,uint256,uint256,uint256)"](
-    boxName,
-    drawTime,
-    ethers.utils.parseEther("0.01"),
-    ethers.utils.parseEther("0")
-  );
-  await tx.wait();
+  // const drawTime = Math.floor(Date.now() / 1000) + 3600 * 8;
+  // const boxName = "Hype"
+  // const tx = await lootboxFactory["deployLootbox(string,uint256,uint256,uint256)"](
+  //   boxName,
+  //   drawTime,
+  //   ethers.utils.parseEther("0.01"),
+  //   ethers.utils.parseEther("0")
+  // );
+  // await tx.wait();
 
-  const lootboxAddress = (await lootboxFactory.functions.lootboxAddress(0))[0];
+  // const lootboxAddress = (await lootboxFactory.functions.lootboxAddress(0))[0];
 
-  console.log("lootbox 0 deployed at", lootboxAddress);
+  // console.log("lootbox 0 deployed at", lootboxAddress);
 
   await hre.run("verify:verify", {
     address: lootboxFactory.address,
@@ -71,18 +71,18 @@ async function main() {
     ],
   });
 
-  await hre.run("verify:verify", {
-    address: lootboxAddress,
-    constructorArguments: [
-      boxName,
-      0,
-      drawTime,
-      ethers.utils.parseEther("0.01"),
-      ethers.utils.parseEther("0"),
-      ethers.constants.MaxUint256,
-      ticketAddress,
-    ],
-  })
+  // await hre.run("verify:verify", {
+  //   address: lootboxAddress,
+  //   constructorArguments: [
+  //     boxName,
+  //     0,
+  //     drawTime,
+  //     ethers.utils.parseEther("0.01"),
+  //     ethers.utils.parseEther("0"),
+  //     ethers.constants.MaxUint256,
+  //     ticketAddress,
+  //   ],
+  // })
 
   await hre.run("verify:verify", {
     address: ticketAddress,
